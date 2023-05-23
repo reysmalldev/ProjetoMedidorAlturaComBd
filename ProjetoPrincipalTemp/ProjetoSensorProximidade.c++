@@ -1,78 +1,78 @@
+//inclusão da biblioteca do lcd
+#include <LiquidCrystal.h> 
+LiquidCrystal lcd(8, 9, 10, 11, 12, 13);
+  
 // C++ code
 //
+
+
+#define botao 1
+int valBotao;
+
 int SonarTrigger = 7;
 int SonarEcho = 6;
 
 float distancia = 0;
 int tempo = 0;
-
-int led1 = 3;
-int led2 = 4;
-int led3 = 5;
+float altPadrao = 1.84;
+float altura = 0;
+float alturaPessoa;
 
 float seno;
 int frequencia;
 
 void setup()
 {
+  pinMode(botao, INPUT);
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
   pinMode(SonarTrigger, OUTPUT);
   pinMode(SonarEcho, INPUT);
   pinMode(8,OUTPUT);
   Serial.begin(9600);
 }
 
- void buz(){
-   if (distancia < 40){
-   		for(int x=0; x<180; x++){
-      seno = (sin(x*3.1416/180));
-      frequencia = 2000+(int(seno*1000));
-      tone(8,frequencia);
-      delay(1);
-    }
-   }else{	
-      noTone(8);
-   }
-	
+void display(){
+  lcd.setCursor(1,0);
+  lcd.print("Voce mede: ");
+  lcd.print(altura);
+  Serial.print("Voce mede:");
+  Serial.print(altura);
+  if (altura < 1.00 ){
+    lcd.setCursor(0,1);
+    lcd.print("");
+  	lcd.print("centimetros");
+    Serial.println(" cm");
+  } else {
+    lcd.setCursor(0,1);
+    lcd.print("");
+    lcd.print("     metros ");
+    Serial.println(" metros         ");
+  }
+  
+  delay(500);
 }
 
-void loop()
-  
-{
+void loop(){
+  valBotao = digitalRead(botao);
   digitalWrite(SonarTrigger, LOW);
   delay(200); // Wait for 1000 millisecond(s)
   digitalWrite(SonarTrigger, HIGH);
   delay(100); // Wait for 1000 millisecond(s)
   digitalWrite(SonarTrigger, LOW);
 
+  //Calculo da altura 
   tempo = pulseIn(SonarEcho,HIGH);
-  distancia = tempo/58.2;
-  
-  if (distancia < 40){
-    digitalWrite(3,LOW);
-  	digitalWrite(5,HIGH);
-    digitalWrite(4,LOW);
-    
-    buz();
-    
-  }else if (distancia > 40 && distancia < 80){
-  	digitalWrite(4,HIGH);
-  	digitalWrite(3,LOW);
-    digitalWrite(5,LOW);
-    buz();
-    
-  }else if (distancia > 80){
-   	digitalWrite(4,LOW);
-  	digitalWrite(5,LOW);
-    digitalWrite(3,HIGH); 
-    buz();
-  }
-  Serial.print("Distancia média: ");
-  Serial.print(distancia);
-  if (distancia <= 100 ){
-  	Serial.println(" cm");
+  distancia = (tempo/58.2)/100;
+  altura = altPadrao - distancia;
+  if (valBotao == 1) {
+  	alturaPessoa = altura;
+    //Serial.print("altura salva e: ");
+    //Serial.println(alturaPessoa);
   } else {
-    Serial.println(" metros");
+    //Serial.print("");
+    //Serial.println("");
   }
   
-  delay(500);
+  display();
 }
