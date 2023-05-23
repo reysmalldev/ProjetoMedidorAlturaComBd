@@ -53,6 +53,16 @@ void display(){
   delay(500);
 }
 
+void enviaphp(){
+   // Construa a string de URL com os parâmetros
+  String url = "http://localhost/ProjetoPrincipalTemp/processo.php?";
+  url += "alturaPessoa=";
+  url += alturaPessoa;
+
+  // Envie a string de URL pela porta serial
+  Serial.println(url);
+}
+
 void loop(){
   valBotao = digitalRead(botao); // quando o botao for clicado recebera 1 se nao 0
 
@@ -72,6 +82,7 @@ void loop(){
 
   if (valBotao == 1) {
   	alturaPessoa = altura;
+    enviaphp();
     //Serial.print("altura salva e: ");
     //Serial.println(alturaPessoa);
   } else {
