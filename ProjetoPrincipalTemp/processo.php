@@ -9,8 +9,17 @@
 <body>
     
     <?php
-    
-    echo 'teste';
+    if (filter_input(INPUT_SERVER,'REQUEST_METHOD') == 'POST') {
+        $nome = filter_input(INPUT_POST,'nome');
+        $idade = filter_input(INPUT_POST,'idade');
+        $peso = filter_input(INPUT_POST,'peso');
+        
+        print "nome: {$nome}<br>Idade: {$idade}<br>Peso: {$peso}";
+    }
+     else {
+        print "Deu ruim";
+    }
+   
 
     ?>
 </body>
