@@ -19,8 +19,6 @@
      else {
         print "Deu ruim";
     }
-   
-
     ?>
 </body>
 </html>
