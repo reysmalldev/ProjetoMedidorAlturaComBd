@@ -54,17 +54,22 @@ void display(){
 }
 
 void loop(){
-  valBotao = digitalRead(botao);
+  valBotao = digitalRead(botao); // quando o botao for clicado recebera 1 se nao 0
+
   digitalWrite(SonarTrigger, LOW);
-  delay(200); // Wait for 1000 millisecond(s)
+  delay(200); 
   digitalWrite(SonarTrigger, HIGH);
-  delay(100); // Wait for 1000 millisecond(s)
+  delay(100); 
   digitalWrite(SonarTrigger, LOW);
 
   //Calculo da altura 
+  
   tempo = pulseIn(SonarEcho,HIGH);
   distancia = (tempo/58.2)/100;
   altura = altPadrao - distancia;
+
+  // comando para quando clicar no botão salvar a altura desejada e futuramente enviar para o banco de dados
+
   if (valBotao == 1) {
   	alturaPessoa = altura;
     //Serial.print("altura salva e: ");
