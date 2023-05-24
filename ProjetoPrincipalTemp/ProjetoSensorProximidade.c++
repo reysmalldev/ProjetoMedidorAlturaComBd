@@ -128,7 +128,7 @@ bool getPage(float alturaPessoa) {
   }
   String param = "?altura=" + String(alturaPessoa); //Parâmetros com as leituras
   Serial.println(param);
-  client.println("GET /processo.php" + param + " HTTP/1.1");
+  client.println("GET /processoAltura.php" + param + " HTTP/1.1");
   client.println("Host: ");
   client.println(http_site);
   client.println("Connection: close");
