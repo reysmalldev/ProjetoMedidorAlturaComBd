@@ -24,10 +24,10 @@
 
         $altura = filter_input(INPUT_GET, 'altura',FILTER_SANITIZE_NUMBER_FLOAT);
         if (is_null($altura)) {
-            die("Dados inválidos");
+            die("<hr>Dados inválidos");
         }
        
-        $sql = "INSERT INTO pessoa (nome, idade, peso, altura) VALUES ($nome,$idade,$peso,$altura)";
+        $sql = "INSERT INTO pessoa (nome, idade, altura) VALUES ('$nome',$idade,(float)$altura)";
         if (!$conn->query($sql)) {
             //Gravar log de erros
             die("Erro na gravação dos dados no BD");
