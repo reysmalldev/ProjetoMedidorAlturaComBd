@@ -33,7 +33,7 @@
             //Gravar log de erros
             die("Não foi possível estabelecer conexão com o BD: " . $conn->connect_error);
         } 
-        $sql = "INSERT INTO pesoa (nome, idade, peso, altura) VALUES ($nome,$idade,$peso,$altura)";
+        $sql = "INSERT INTO aluno (nome, idade, peso, altura) VALUES ($nome,$idade,$peso,$altura)";
         if (!$conn->query($sql)) {
             //Gravar log de erros
             die("Erro na gravação dos dados no BD");
