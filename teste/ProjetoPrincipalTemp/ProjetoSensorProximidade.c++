@@ -9,7 +9,7 @@ const char ssid[] = "login";
 const char psw[] = "senha";
 
 // Site remoto - Dados do site que vai receber a requisição POST ou GET
-const char http_site[] = "http://localhost/processa.php";
+const char http_site[] = "http://localhost:80/ProjetoPrincipalTemp/processa.php";
 const int http_port = 8080;
 
 // Variáveis globais
