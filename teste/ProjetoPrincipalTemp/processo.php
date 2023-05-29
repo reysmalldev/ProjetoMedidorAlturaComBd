@@ -56,22 +56,31 @@
             die("Conexão falhou: " . mysqli_connect_error());
         }
 
+
+
         //Prepara a query INSERT
         $sql = "INSERT INTO pessoa (nome, idade, peso, altura)
         VALUES ('$nome', '$idade', '$peso', '$altura')";
 
-        //Executa a query somente se todas as informações estiverem completas(não esta funcionando)
-        if (empty($nome) && empty($idade) && empty($peso) && empty($altura)) {
+        //Executa a query somente se todas as informações estiverem completas(exceto a altura)
+        if ($nome != null && $idade != null && $peso != null) {
             if (mysqli_query($conn, $sql)) {
                 echo "<br><hr>Inserção realizada com sucesso!";
                 echo "altura: ".$altura;
             } else {
                 echo "<br><hr>Erro ao inserir na tabela: " . mysqli_error($conn);
             }
-          } else {
-            echo 'Sim! Estou vazio!<br>';
-            echo 'dados incompletos';
-          }
+        // Se as outras informações forem nulas o código abaixo será executado caso a altura tenha valor
+        } else if ($altura != null || $altura != ""){
+           
+
+            // alt é a variavel que armazena o codigo slq que colocará a altura na linha correspondente a pessoa assim que ela
+            // tiver se pesado na balança. (lembrando que ela acabara de passar seus dados para fazer o cadastro de altura e idade).
+            $alt = "UPDATE pessoa SET altura = {$altura} WHERE altura = 0";
+            mysqli_query($conn, $alt);
+        }  
+        
+
         
         //Fecha a conexão
         mysqli_close($conn);
