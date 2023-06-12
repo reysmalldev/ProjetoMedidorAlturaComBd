@@ -107,18 +107,12 @@ void loop()
 
   // comando para quando clicar no botão salvar a altura desejada e futuramente enviar para o banco de dados
 
-  if (valBotao == 1)
+  if (pinBotao1Retencao())
   {
-    // Envio dos dados do sensor para o servidor via GET - duplicado temporariamente pq os dados tem q ser enviados somente quando clicado no botao
     if (!getPage((float)alturaPessoa))
     {
       Serial.println("GET request failed");
     }
-  }
-  else
-  {
-    // Serial.print("");
-    // Serial.println("");
   }
 
   // função para mostrar a altura medida no momento atual no display
@@ -126,10 +120,6 @@ void loop()
 
   ///////////////////////
   // Envio dos dados do sensor para o servidor via GET
-  if (!getPage((float)alturaPessoa))
-  {
-    Serial.println("GET request failed");
-  }
 }
 
 // Executa o HTTP GET request no site remoto
@@ -156,4 +146,27 @@ bool getPage(float alturaPessoa)
     Serial.print(line);
   }
   return true;
+}
+
+bool pinBotao1Retencao()
+{
+#define tempoDebounce 50 //(tempo para eliminar o efeito Bounce EM MILISEGUNDOS)
+
+  bool estadoBotao;
+  static bool estadoBotaoAnt;
+  static bool estadoRet = true;
+  static unsigned long delayBotao = 0;
+
+  if ((millis() - delayBotao) > tempoDebounce)
+  {
+    estadoBotao = digitalRead(botao);
+    if (estadoBotao && (estadoBotao != estadoBotaoAnt))
+    {
+      estadoRet = !estadoRet;
+      delayBotao = millis();
+    }
+    estadoBotaoAnt = estadoBotao;
+  }
+
+  return estadoRet;
 }
