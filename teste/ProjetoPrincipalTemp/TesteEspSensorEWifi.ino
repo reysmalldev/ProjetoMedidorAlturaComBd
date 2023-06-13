@@ -3,28 +3,35 @@
     It sends a "hello" message, and then prints received data.
 */
 // inclusão da biblioteca do lcd
-//#include <LiquidCrystal.h>
-//LiquidCrystal lcd(5, 4, 0, 2, 14, 12);
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(5, 4, 0, 2, 14, 12);
 
 #define botao 16
+int valBotao = 0;
 
-//define sound velocity in cm/uS
-#define SOUND_VELOCITY 0.034
-#define CM_TO_INCH 0.393701
+int SonarTrigger = 15;
+int SonarEcho = 13;
 
-int SonarTrigger = 12;
-int SonarEcho = 14;
-
-long duration;
-float distanceCm;
-float distanceInch;
+float distancia = 0;
+int tempo = 0;
+float altPadrao = 1.84;
+float altura = 0;
+float alturaPessoa;
 
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 
 #ifndef STASSID
 #define STASSID "ANDRADE"
 #define STAPSK "192530Pecf"
 #endif
+
+// Site remoto - Dados do site que vai receber a requisição POST ou GET
+const char http_site[] = "http://fe80::1%2";
+const int http_port = 8080;
+
+WiFiClient client;
+IPAddress server(192, 168, 10, 6); // Endereço IP do servidor - http_site
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
@@ -59,36 +66,119 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   pinMode(botao, INPUT);
-  //lcd.begin(16, 2);
-  //lcd.setCursor(0, 0);
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
   pinMode(SonarTrigger, OUTPUT);
   pinMode(SonarEcho, INPUT);
- // pinMode(5, OUTPUT);
+  pinMode(5, OUTPUT);
+}
+
+void display()
+{
+  lcd.setCursor(1, 0);
+  lcd.print("Voce mede: ");
+  lcd.print(altura);
+  Serial.print("Voce mede:");
+  Serial.print(altura);
+  if (altura < 1.00)
+  {
+    lcd.setCursor(0, 1);
+    lcd.print("");
+    lcd.print("centimetros");
+    Serial.println(" cm");
+  }
+  else
+  {
+    lcd.setCursor(0, 1);
+    lcd.print("");
+    lcd.print("     metros ");
+    Serial.println(" metros         ");
+  }
+
+  delay(500);
 }
 
 void loop() {
-  // Clears the trigPin
+  valBotao = digitalRead(botao); // quando o botao for clicado recebera 1 se nao 0
+
   digitalWrite(SonarTrigger, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
+  delay(200);
   digitalWrite(SonarTrigger, HIGH);
-  delayMicroseconds(10);
+  delay(100);
   digitalWrite(SonarTrigger, LOW);
-  
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(SonarEcho, HIGH);
-  
-  // Calculate the distance
-  distanceCm = duration * SOUND_VELOCITY/2;
-  
-  // Convert to inches
-  distanceInch = distanceCm * CM_TO_INCH;
-  
-  // Prints the distance on the Serial Monitor
-  Serial.print("Distance (cm): ");
-  Serial.println(distanceCm);
-  Serial.print("Distance (inch): ");
-  Serial.println(distanceInch);
+
+  // Calculo da altura
+  tempo = pulseIn(SonarEcho, HIGH);
+  distancia = (tempo / 58.2) / 100;
+  altura = altPadrao - distancia;
+
+  // comando para quando clicar no botão salvar a altura desejada e futuramente enviar para o banco de dados
+  if (pinBotao1Retencao())
+  {
+    if (!getPage((float)alturaPessoa))
+    {
+      Serial.println("GET request failed");
+    }
+  }
+
+  if (pinBotao1Retencao()) {
+    if (!getPage((float)alturaPessoa))
+    {
+      Serial.println("GET request failed");
+    }
+  	alturaPessoa = altura;
+    Serial.println(valBotao);
+    Serial.print("altura salva e: ");
+    Serial.println(alturaPessoa);
+  }
+
+  display();
   
   delay(1000);
+}
+
+// Executa o HTTP GET request no site remoto
+bool getPage(float alturaPessoa)
+{
+  if (!client.connect(server, http_port))
+  {
+    Serial.println("Falha na conexao com o site ");
+    return false;
+  }
+  String param = "?alturaPessoa=" + String(alturaPessoa); // Parâmetros com as leituras
+  Serial.println(param);
+  client.println("localhost/Altura/processo.php" + param + " HTTP/1.1");
+  client.println("Host: ");
+  client.println(http_site);
+  client.println("Connection: close");
+  client.println();
+  client.println();
+
+  // Informações de retorno do servidor para debug
+  while (client.available())
+  {
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  return true;
+}
+
+bool pinBotao1Retencao() {
+   #define tempoDebounce 50 //(tempo para eliminar o efeito Bounce EM MILISEGUNDOS)
+
+   bool estadoBotao;
+   static bool estadoBotaoAnt; 
+   static bool estadoRet = true;
+   static unsigned long delayBotao = 0;
+
+   if ( (millis() - delayBotao) > tempoDebounce ) {
+       estadoBotao = digitalRead(botao);
+       if ( estadoBotao && (estadoBotao != estadoBotaoAnt) ) {
+          estadoRet = !estadoRet;
+          delayBotao = millis();
+       }
+       estadoBotaoAnt = estadoBotao;
+   }
+
+   return estadoRet;
 }
