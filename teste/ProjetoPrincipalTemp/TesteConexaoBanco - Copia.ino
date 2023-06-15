@@ -1,14 +1,16 @@
 
 #include <ESP8266WiFi.h>           // Use this for WiFi instead of Ethernet.h
+//#include <MySQL_Generic.h>
 #include <MySQL_Connection.h>
 #include <MySQL_Cursor.h>
 
-IPAddress server_addr(192, 168, 10, 6);  // IP of the MySQL *server* here 192.168.10.6
-char user[] = "root";              // MySQL user login username
-char password[] = "";        // MySQL user login password  
 
-// Sample query UPDATE pessoa SET altura = {$altura} WHERE altura = 0"
-char INSERT_SQL[] = "UPDATE dbaltura.pessoa SET = 1.65 WHERE altura = 0";
+IPAddress server_addr(85, 10, 205, 173);  // IP of the MySQL *server* here localhost: 192.168.10.6 db4free: 85.10.205.173
+char user[] = "usercaue_14";              // MySQL user login username
+char password[] = "mlkzicka";        // MySQL user login password  
+
+// Sample query UPDATE pessoa SET altura = 1.65 WHERE altura = 0"
+char INSERT_SQL[] = "UPDATE db_caue14.pessoa SET altura = 1.65 WHERE altura = 0";
 
 // WiFi card example
 char ssid[] = "ANDRADE";         // your SSID
